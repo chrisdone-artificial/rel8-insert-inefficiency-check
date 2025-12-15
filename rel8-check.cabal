@@ -12,7 +12,6 @@ author:         Chris Done
 maintainer:     chris@chrisdone.com
 copyright:      2025 Chris Done
 license:        BSD-3-Clause
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
