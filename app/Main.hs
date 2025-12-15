@@ -35,9 +35,9 @@ fileSchema = Rel8.TableSchema
   }
 
 -- Helper to create a file record for insertion
-mkFileInsert :: BS.ByteString -> FileSchema Rel8.Expr
+mkFileInsert :: BS.ByteString -> FileSchema Rel8.Result
 mkFileInsert fContent = FileSchema
-  { fileContent = Rel8.lit fContent
+  { fileContent = fContent
   }
 
 -- Main demo function
@@ -66,10 +66,11 @@ main = do
 -- Insert function using Rel8
 insertFile :: BS.ByteString -> Hasql.Session ()
 insertFile fContent = do
-  let fileRecord = mkFileInsert fContent
-  Hasql.statement () $ Rel8.run_ $ Rel8.insert $ Rel8.Insert
+  let run = Rel8.prepared Rel8.run_
+  Hasql.statement (mkFileInsert fContent) $
+    run $ \f -> Rel8.insert $ Rel8.Insert
     { into = fileSchema
-    , rows = Rel8.values [fileRecord]
+    , rows = Rel8.values [f]
     , onConflict = Rel8.Abort
     , returning = Rel8.NoReturning
     }
