@@ -19,7 +19,7 @@ stack build --file-watch --exec rel8-check
 
 Output:
 
-```
+```sql
 Connected to database
 encodeUtf8 ... => ditto
 Text.pack sql => ditto
@@ -76,3 +76,22 @@ The following sequence of steps happens:
 * Then `encodeUtf8` to a `ByteString`
 
 Then the whole thing is sent to the server as a giant query. :facepalm:
+
+## Furthermore
+
+Inserting more than one value means we build a query of size O(n)
+where n = number of values.
+
+```haskell
+    , rows = Rel8.values [fileRecord, fileRecord]
+```
+
+Output:
+
+```sql
+INSERT INTO "files" ("content")
+VALUES
+(CAST(E'\\x48656c6c6f2c20746869732069732073616d706c652066696c6520636f6e74656e7421' AS "bytea")),
+(CAST(E'\\x48656c6c6f2c20746869732069732073616d706c652066696c6520636f6e74656e7421'
+AS "bytea"))
+```
